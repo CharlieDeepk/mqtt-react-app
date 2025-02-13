@@ -1,5 +1,5 @@
 import React, { useState } from "react";
-// import "./App.css";
+import "./App.css";
 import SubscriptionCard from "./components/SubscriptionCard.jsx";
 import EmptyWidget from "./components/EmptyWidget.jsx";
 import { styled } from "@mui/joy/styles";

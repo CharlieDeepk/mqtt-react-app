@@ -12,16 +12,20 @@ import { Tooltip } from "@mui/joy";
 import { TopicSubscriptions } from "./SubscriptionContext.jsx";
 import mqtt from "mqtt";
 import { getStaticData } from "../utils/constants.jsx";
-import { formattedDate, formattedTime } from "../utils/formatedDate.jsx";
+import { getLatestDateTime } from "../utils/formatedDate.jsx";
 
 export default function SubscriptionCard({ index }) {
   const { setSubscriptions } = React.useContext(TopicSubscriptions);
   const [currentVal, setCurrentVal] = React.useState(0);
+  const [currentDateTime, setCurrentDateTime] = React.useState(
+    getLatestDateTime(new Date())
+  );
 
-  const { subscriptionTopic, tileName } = getStaticData(index);
+  const { hostIp, port, subscriptionTopic, tileName } = getStaticData(index);
 
   const clientId = "mqttjs_" + Math.random().toString(16).substr(2, 8);
-  const host = "ws://broker.emqx.io:8083/mqtt";
+  // const host = "ws://broker.emqx.io:8083/mqtt";
+  const host = "ws://" + hostIp + ":" + port + "/mqtt";
 
   const options = {
     keepalive: 30,
@@ -59,10 +63,9 @@ export default function SubscriptionCard({ index }) {
     console.log(
       "Received Message:= " + message.toString() + "\nOn topic:= " + topic
     );
+    setCurrentDateTime(getLatestDateTime(new Date()));
     const jsonString = message.toString();
-
     const jsonObject = JSON.parse(jsonString);
-
     const tempString = jsonObject.temp;
     const tempInt = parseInt(tempString, 10);
     setCurrentVal(tempInt);
@@ -90,7 +93,9 @@ export default function SubscriptionCard({ index }) {
       <div>
         <Typography level="title-lg">{tileName}</Typography>
         <Typography level="body-sm">
-          {formattedDate + " | " + formattedTime}
+          {currentDateTime.formattedTime +
+            " | " +
+            currentDateTime.formattedDate}
         </Typography>
         <Tooltip title="Unsubscribe" placement="top">
           <IconButton
